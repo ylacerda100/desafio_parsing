@@ -1,8 +1,15 @@
 from pymongo import MongoClient
 
-d = []
+# criando banco de dados
 
-# extraindo os dados do arquivo txt
+client = MongoClient('localhost', 27017)
+
+db = client.get_database('receita_cnpj')
+
+cnpjs = db.get_collection('cnpjs')
+
+
+# extraindo os dados do arquivo txt e inserindo no db
 
 with open('cnpjs.txt', 'r') as file:
     for line in file:
@@ -10,7 +17,7 @@ with open('cnpjs.txt', 'r') as file:
             continue
         elif line.startswith('1'):
             data = line.split()
-            d.append({
+            db.cnpjs.insert_one({
                 'estrutura': 'matriz',
                 'cnpj': line[3:18],
                 'nome': line[18:40],
@@ -19,20 +26,9 @@ with open('cnpjs.txt', 'r') as file:
 
         elif line.startswith('2'):
             data = line.split()
-            d.append({
+            db.cnpjs.insert_one({
                 'estrutura': 'filial',
                 'cnpj': line[3:18],
                 'nome': line[18:50],
                 'data_cadastro': data[-5][21:]})
 
-# criando banco de dados e inserindo os cnpjs
-
-cliente = MongoClient('localhost', 27017)
-
-db = cliente.test_database
-
-dados = db.test_collection
-
-dados = db.dados
-
-dados.insert_many(d)
